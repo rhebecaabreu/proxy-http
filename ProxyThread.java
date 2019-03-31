@@ -26,15 +26,16 @@ public class ProxyThread implements Runnable {
   }
 
   private void recieveFromClient() {    
-    try {
-      String requestString;
+    StringTokenizer tokenizedLine;
+    String requestString;
 
+    try {
       proxyToClientBr = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
       proxyToClientBw = new BufferedWriter(new OutputStreamWriter(socketClient.getOutputStream()));
 
       requestString = proxyToClientBr.readLine();
      
-      StringTokenizer tokenizedLine = new StringTokenizer(requestString);
+      tokenizedLine = new StringTokenizer(requestString); //TODO arrumar isso aqui, tem hora que da null pointer 
       
       String request="", http="", urlString="";
       while(tokenizedLine.hasMoreTokens()) { 
@@ -49,17 +50,14 @@ public class ProxyThread implements Runnable {
 
         if (request.equals("GET")) {
           System.out.println("Request Received " + requestString);
-          sendData(urlString, request, http);
+          sendDataToServer(urlString, request, http);
         } else {
           System.out.println("Bad Request Message");
         }
-
         request = null;
         urlString = null;
         http = null;
-
       }
-
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -76,25 +74,27 @@ public class ProxyThread implements Runnable {
   }
 
 
-  public void sendData(String urlString, String requestType, String httpVersion) {
+  public void sendDataToServer(String urlString, String requestType, String httpVersion) {
     try {
       String[]file = fileName(urlString);
       String fileName=file[0];
       String fileExtension=file[1];
 
       if(!checkIfIsImage(fileExtension, urlString, fileName)) {
-        
         // Create the URL
         URL remoteURL = new URL(urlString);
 
         // Create a connection to remote server
         HttpURLConnection proxyToServerCon = (HttpURLConnection) remoteURL.openConnection();
-        proxyToServerCon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        proxyToServerCon.setRequestProperty("Content-Language", "en-US");
         proxyToServerCon.setUseCaches(false);
         proxyToServerCon.setDoOutput(true);
+        proxyToServerCon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        proxyToServerCon.setRequestProperty("Content-Language", "en-US");
+
+        BufferedWriter proxyToServerBw = new BufferedWriter(new OutputStreamWriter(proxyToServerCon.getOutputStream()));
+        proxyToServerBw.write(request(urlString, requestType, httpVersion));
+ 
         // System.out.println(proxyToServerCon.getHeaderFields());
-        
         BufferedReader proxyToServerBR = new BufferedReader(new InputStreamReader(proxyToServerCon.getInputStream()));
 
         if(proxyToServerCon.getResponseCode()==200) {
@@ -119,6 +119,8 @@ public class ProxyThread implements Runnable {
           if (proxyToServerBR != null) {
             proxyToServerBR.close();
           }
+        } else {
+
         }
       }
       if (proxyToClientBw != null) {

@@ -1,9 +1,9 @@
-import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.net.*;
 
 public class Proxy {
-  public static void main(String[] args) {    
+  public static void main(String[] args) {
     try {
       if (args.length != 2) {
         throw new IllegalArgumentException("Wrong number of arguments.");
@@ -14,17 +14,17 @@ public class Proxy {
 
       ServerSocket server = new ServerSocket(localport);
       System.out.println("Starting proxy on port " + server.getLocalPort()); // And start running the server
+      System.out.println("Waiting client connection...");
 
       while (true) {
-        ProxyThread proxythread = new ProxyThread(server.accept(), cacheSize);
-        Thread thread = new Thread(proxythread);
+        ProxyServer proxyServer = new ProxyServer(server.accept(), cacheSize);
+        Thread thread = new Thread(proxyServer);
         thread.start();
-      }    
+      }
     } catch (Exception e) {
       System.out.println(e.getMessage());
       System.err.println("Usage: java Proxy " + "<localport> <cache size>");
     }
   }
 
- 
 }

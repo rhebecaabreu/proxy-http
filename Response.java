@@ -7,24 +7,33 @@ public class Response {
   BufferedReader reader;
   ArrayList<String> linesResponseFromServer = new ArrayList<>();
 
+  public Response() { 
+
+  }
   public Response(BufferedReader reader) {
     this.reader = reader;
   }
 
-  public void readResponseFromServer() {
+  public String readResponseFromServer() {
+
     String line;
+    String response = ""; 
     try {
       while ((line = reader.readLine()) != null) {
         linesResponseFromServer.add(line);
+        response += line + "\r\n";
       }
 
       // Close Down Resources
       if (reader != null) {
         reader.close();
       }
+
+      return response;
     } catch (IOException e) {
       System.out.println("Error trying to get response from server");
       e.printStackTrace();
+      return null;
     }
   }
 

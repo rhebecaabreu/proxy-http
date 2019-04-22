@@ -12,7 +12,7 @@ public class Request {
   private HashMap<String, String> headerRequest = new HashMap<>();
   public BufferedReader reader;
   public BufferedWriter outputStream;
-  public String addressHost;
+  public String addressHost="";
 
   public Request(BufferedReader reader) {
     this.reader = reader;
@@ -78,7 +78,6 @@ public class Request {
           fileExtension = fileExtension.replace('.', '_');
           fileExtension += ".html";
         }
-        System.out.println("------------------_>  "+fileExtension);
 
         // Check if file is an image
         if((fileExtension.contains(".png")) || fileExtension.contains(".jpg") ||
@@ -135,7 +134,7 @@ public class Request {
   public void isImage(String imageUrlString, Socket socketClient) {
     try {
       URL imageURL = new URL(imageUrlString);
-
+      
       BufferedImage bufferedImage = ImageIO.read(imageURL);
       final DataOutputStream outToClient = new DataOutputStream(socketClient.getOutputStream());
 
@@ -146,7 +145,7 @@ public class Request {
         System.out.println(error);
         throw new IOException("Failed to download image");
       }
-
+      
       String response = "";
       response += "HTTP/1.1 200 OK\r\n";
       response += "Server: Proxy Server/1.0\r\n";

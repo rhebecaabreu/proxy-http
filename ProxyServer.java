@@ -6,10 +6,12 @@ import java.nio.charset.StandardCharsets;
 public class ProxyServer implements Runnable {
   private Socket socketClient;
   private int cacheSize;
+  private ProxyCacheLRU proxyCacheLRU; 
 
   public ProxyServer(Socket socket, int cacheSize){
     this.socketClient = socket;
     this.cacheSize = cacheSize;
+    this.proxyCacheLRU = new ProxyCacheLRU(cacheSize);
   }
 
   @Override
@@ -37,10 +39,34 @@ public class ProxyServer implements Runnable {
       BufferedReader readerServer = readRequest.sendRequestToServer(socketClient);
 
       // was a image?
+      String cachedData="";
+      boolean isCached = false; 
       if (readerServer != null) {
         Response response = new Response(readerServer);
-        response.readResponseFromServer();
-        response.sendResponseToClient(outputStream);
+
+        synchronized (proxyCacheLRU) {
+          System.out.println(readRequest.addressHost);
+          if (proxyCacheLRU.containsKey(readRequest.addressHost)) {
+            cachedData = proxyCacheLRU.get(readRequest.addressHost);
+            System.out.println("Cache hit........" + readRequest.addressHost);
+            System.out.println(cachedData);
+            System.out.println("paozinhho");
+            isCached = true;
+          } else {
+            cachedData = response.readResponseFromServer();
+            response.sendResponseToClient(outputStream);
+
+            if (cachedData.length() > cacheSize) {
+              System.out.println("File size larger than cache....");
+            } else {
+              String cache_miss = proxyCacheLRU.put(readRequest.addressHost, cachedData);
+              System.out.println("Cache missed.........." + cache_miss);
+            }
+          }
+        }
+        if(isCached) {
+          outputStream.write(cachedData);
+        }
       }
     } catch (Exception e) {
       System.out.println("Error trying to start server");

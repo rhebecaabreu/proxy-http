@@ -23,7 +23,7 @@ public class Proxy {
       }
     } catch (Exception e) {
       System.out.println(e.getMessage());
-      System.err.println("Usage: java Proxy " + "<localport> <cache size>");
+      System.err.println("Usage: java Proxy " + "<localport> <cache size in MB>");
     }
   }
 

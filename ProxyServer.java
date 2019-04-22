@@ -50,7 +50,7 @@ public class ProxyServer implements Runnable {
             cachedData = proxyCacheLRU.get(readRequest.addressHost);
             System.out.println("Cache hit........" + readRequest.addressHost);
             System.out.println(cachedData);
-            System.out.println("paozinhho");
+            System.out.println("test");
             isCached = true;
           } else {
             cachedData = response.readResponseFromServer();

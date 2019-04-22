@@ -7,8 +7,8 @@ public class ProxyCacheLRU {
   public static int cache_size;
   public static Map<String, String> map = new HashMap<String, String>();
 
-  public ProxyCacheLRU(int cacheSizeKB) {
-    this.cache_size = cacheSizeKB;
+  public ProxyCacheLRU(int cacheSizeMB) {
+    this.cache_size = (cacheSizeMB * 4) * 1000000;
   }
 
   private static PriorityQueue<ProxyCacheItem> timestamp_queue = new PriorityQueue<ProxyCacheItem>(200, new Comparator() {
@@ -51,7 +51,7 @@ public class ProxyCacheLRU {
   }
 
   public boolean containsKey(String key) {
-    System.out.println("chegay aqui ======> "+ key);
+    System.out.println("======> "+ key);
     boolean flag = false;
     for (Map.Entry<String, String> entry : map.entrySet()) {
       if (entry.getKey().equals(key)) {
